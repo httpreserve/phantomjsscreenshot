@@ -1,4 +1,4 @@
-package gnomescreenshot
+package phantomjsscreenshot
 
 import (
 	"bufio"
@@ -13,7 +13,7 @@ import (
 var dir = "/tmp/"
 
 // EncodingField tells the browser what we've encoded and how to decode it
-const EncodingField = "data:image/png;base64,"
+const EncodingField = "data:image/jpeg;base64,"
 
 // getUUID returns a UUID string to be used for naming
 func getUUID() string {
@@ -27,15 +27,16 @@ func getUUID() string {
 func GrabScreenshot(link string) (string, error) {
 
 	//get new filename
-	filename := dir + getUUID() + ".png"
+	filename := dir + getUUID() + ".jpg"
 
-	command := "gnome-web-photo"
-	thumbnail := "--mode=thumbnail"
-	size := "-s"
-	sizeVal := "256"
+	//ideal command on server...
+	//phantomjs /usr/js/httpreserve.js http://www.bbc.co.uk bbc.jpg
+
+	command := "phantomjs"
+	script := "/usr/js/httpreserve.js"
 	hyperlink := link
 
-	args := []string{thumbnail, size, sizeVal, hyperlink, filename}
+	args := []string{script, hyperlink, filename}
 	cmd := exec.Command(command, args...)
 
 	var out bytes.Buffer
@@ -46,6 +47,20 @@ func GrabScreenshot(link string) (string, error) {
 		return "", errors.Wrap(err, "command run")
 	}
 
+	//convert to thumbnail...
+	//convert site_thumbnail.jpg -resize 500x450 site_thumbnail.jpg
+	command = "convert"
+	resize := "-resize"
+	dimensions := "400x350"
+
+	args = []string{filename, resize, dimensions, filename}
+	cmd = exec.Command(command, args...)
+	err = cmd.Run()
+	if err != nil {
+		return "", errors.Wrap(err, "command run")
+	}
+
+	// output base64 string...
 	b64, err := b64png(filename)
 
 	err = os.Remove(filename)
