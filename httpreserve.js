@@ -17,7 +17,7 @@ page.viewportSize = { width: 1024, height: 768 };
 page.clipRect = { left: 0, top: 0, width: 1024, height: 768 };
 
 //set a sensible user-agent
-page.settings.userAgent = 'httpreserve-websnapshot-0.0.1';
+page.settings.userAgent = 'httpreserve-websnapshot/0.0.1';
 
 //the rest of the code is the same as the previous example
 page.open(address, function() {
