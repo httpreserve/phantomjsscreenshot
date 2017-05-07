@@ -21,6 +21,27 @@ func getUUID() string {
 	return uid.String()
 }
 
+// Hello enables the calling agent to determine whether the webshot service
+// has been setup correctly. If it returns false then we can configure the
+// agent to not call screenshots every time. It may help to reduce the setup
+// overhead for folks wishing to run this service for themselves.
+func Hello() bool {
+
+	// run the most basic command we can, e.g. just the cmd in the
+	// OS. Any error should be that the cmd isn't available to call
+	command := "phantomjs"
+
+	// execute the command and if there's an error return false
+	cmd := exec.Command(command)
+	err := cmd.Run()
+	if err != nil {
+		return false
+	}
+
+	// we're all good, return true...
+	return true
+}
+
 // GrabScreenshot returns a link to a screenshot for retrieval on localhost
 // and and errors encountered along the way with the calling application
 // returns fileloc, command output, error
