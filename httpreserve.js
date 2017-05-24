@@ -20,7 +20,9 @@ page.clipRect = { left: 0, top: 0, width: 1024, height: 768 };
 page.settings.userAgent = 'httpreserve-websnapshot/0.0.1';
 
 //the rest of the code is the same as the previous example
-page.open(address, function() {
+page.open(address);
+page.onLoadFinished = function(status) {
   page.render(output, {quality: '100'});
   phantom.exit();
-});
+};
+
