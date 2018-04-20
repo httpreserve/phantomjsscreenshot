@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/base64"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"os"
@@ -44,8 +45,11 @@ func Hello() bool {
 
 // GrabScreenshot returns a link to a screenshot for retrieval on localhost
 // and and errors encountered along the way with the calling application
-// returns fileloc, command output, error
-func GrabScreenshot(link string) (string, error) {
+// returns fileloc, command output, error. The link will not always resolve
+// given a protocol, e.g. http:// but more testing is needed to demonstrate
+// this on multiple systems. If width and height are set to -1 then no resize
+// happens on the way out of this function.
+func GrabScreenshot(link string, width int, height int) (string, error) {
 
 	//get new filename
 	filename := dir + getUUID() + ".jpg"
@@ -70,15 +74,16 @@ func GrabScreenshot(link string) (string, error) {
 
 	//convert to thumbnail...
 	//convert site_thumbnail.jpg -resize 500x450 site_thumbnail.jpg
-	command = "convert"
-	resize := "-resize"
-	dimensions := "400x350"
-
-	args = []string{filename, resize, dimensions, filename}
-	cmd = exec.Command(command, args...)
-	err = cmd.Run()
-	if err != nil {
-		return "", errors.Wrap(err, "command run")
+	if width > 0 && height > 0 {
+		command = "convert"
+		resize := "-resize"
+		dimensions := fmt.Sprintf("%sx%s",width,height)
+		args = []string{filename, resize, dimensions, filename}
+		cmd = exec.Command(command, args...)
+		err = cmd.Run()
+		if err != nil {
+			return "", errors.Wrap(err, "command run")
+		}
 	}
 
 	// output base64 string...
