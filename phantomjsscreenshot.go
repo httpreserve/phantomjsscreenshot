@@ -69,7 +69,7 @@ func GrabScreenshot(link string, width int, height int) (string, error) {
 
 	err := cmd.Run()
 	if err != nil {
-		return "", errors.Wrap(err, "command run")
+		return "", errors.Wrap(err, "phantomjs command run")
 	}
 
 	//convert to thumbnail...
@@ -77,12 +77,13 @@ func GrabScreenshot(link string, width int, height int) (string, error) {
 	if width > 0 && height > 0 {
 		command = "convert"
 		resize := "-resize"
-		dimensions := fmt.Sprintf("%sx%s",width,height)
+		dimensions := fmt.Sprintf("%dx%d",width,height)
 		args = []string{filename, resize, dimensions, filename}
 		cmd = exec.Command(command, args...)
 		err = cmd.Run()
 		if err != nil {
-			return "", errors.Wrap(err, "command run")
+			message := fmt.Sprintf("ImageMagick command run, params: %s %s %s", command, resize, dimensions)
+			return "", errors.Wrap(err, message)
 		}
 	}
 
